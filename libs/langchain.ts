@@ -1,4 +1,3 @@
-// langchain.ts
 import { ChatVertexAI } from "@langchain/google-vertexai";
 import { BufferMemory } from 'langchain/memory';
 import { ConversationChain } from 'langchain/chains';
@@ -6,31 +5,14 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-const initializeLLM = () => {
-  try {
-    if (!process.env.GOOGLE_CREDENTIALS_BASE64) {
-      throw new Error('Google credentials not found');
-    }
-
-    const credentials = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString();
-    const parsedCredentials = JSON.parse(credentials);
-
-    return new ChatVertexAI({
-      authOptions: { credentials: parsedCredentials },
-      model: "gemini-1.5-flash",
-      temperature: 0.7,
-      maxOutputTokens: 1024,
-      topP: 0.9,
-    });
-  } catch (error) {
-    console.error('Error initializing LLM:', error);
-    throw error;
-  }
-};
+const llm = new ChatVertexAI({
+  model: "gemini-1.5-flash",
+  temperature: 0.7,
+  maxOutputTokens: 1024,
+  topP: 0.9,
+});
 
 export const createConversationChain = (instruction: string) => {
-  const llm = initializeLLM();
-  
   const memory = new BufferMemory({
     returnMessages: true,
     memoryKey: "history",
@@ -45,16 +27,16 @@ export const createConversationChain = (instruction: string) => {
     - Engaging, asking follow-up questions or making relevant comments to keep the conversation flowing
     - Structured with short paragraphs and occasional bullet points for clarity
     - Empathetic, acknowledging the user's feelings or perspective when appropriate
-
+  
     Important context about the user or topic:
     {instruction}
-
+  
     Previous conversation:
     {history}
-
+  
     Human: {input}
     AI: Hey there! Great to chat with you about this. Here's what I know:
-  `);
+    `);
 
   const chain = RunnableSequence.from([
     {
