@@ -8,7 +8,7 @@ const client = new PredictionServiceClient();
 export const  askVertexAI = async (prompt: string, contextData: string) => {
     try {
         const request = {
-            endpoint: "projects/ai-assistant-447215/locations/asia-south1/publishers/google/models/gemini",
+            endpoint: `projects/${projectId}/locations/${location}/publishers/google/models/gemini`,
             instance: [
                 {
                     content: prompt,
