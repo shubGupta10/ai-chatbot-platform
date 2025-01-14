@@ -10,7 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-ai-assistant-447215-02e5172e3d4a.json
 .env
 
 node_modules
