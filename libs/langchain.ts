@@ -1,22 +1,34 @@
-import { ChatVertexAI } from "@langchain/google-vertexai";
-import { BufferMemory } from "langchain/memory";
-import { ConversationChain } from "langchain/chains";
-import { PromptTemplate } from "@langchain/core/prompts";
-import { RunnableSequence } from "@langchain/core/runnables";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+import { GoogleAuth } from 'google-auth-library';
+import { ChatVertexAI } from '@langchain/google-vertexai';
+import { BufferMemory } from 'langchain/memory';
+import { ConversationChain } from 'langchain/chains';
+import { PromptTemplate } from '@langchain/core/prompts';
+import { RunnableSequence } from '@langchain/core/runnables';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 
-const llm = new ChatVertexAI({
-  model: "gemini-1.5-flash",
-  temperature: 0.7,
-  maxOutputTokens: 1024,
-  topP: 0.9,
-});
+// Authenticate with Google
+export const authenticateGoogle = async () => {
+  const credentialsEnv = process.env.GOOGLE_VERTEX_AI_WEB_CREDENTIALS;
+  if (!credentialsEnv) {
+    throw new Error('GOOGLE_VERTEX_AI_WEB_CREDENTIALS environment variable is not defined');
+  }
+  const credentials = JSON.parse(credentialsEnv);
 
+  const auth = new GoogleAuth({
+    credentials,  // Pass the parsed credentials object
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],  // Scope for Google Cloud APIs
+  });
+
+  const client = await auth.getClient();
+  return client;
+};
+
+// Initialize LangChain with Google Vertex AI
 export const createConversationChain = (instruction: string) => {
   const memory = new BufferMemory({
     returnMessages: true,
-    memoryKey: "history",
-    inputKey: "input",
+    memoryKey: 'history',
+    inputKey: 'input',
   });
 
   const prompt = PromptTemplate.fromTemplate(`
@@ -45,13 +57,18 @@ export const createConversationChain = (instruction: string) => {
       instruction: () => instruction,
     },
     prompt,
-    llm,
+    new ChatVertexAI({
+      model: 'gemini-1.5-flash',
+      temperature: 0.7,
+      maxOutputTokens: 1024,
+      topP: 0.9,
+    }),
     new StringOutputParser(),
     (output: string) => {
       return output
-        .replace(/\b(Mr\.|Mrs\.|Ms\.|Dr\.)\s/g, "")
-        .replace(/\b(user|individual|person)\b/g, "they")
-        .replace(/\.([\s\n])/g, ".$1 ")
+        .replace(/\b(Mr\.|Mrs\.|Ms\.|Dr\.)\s/g, '')
+        .replace(/\b(user|individual|person)\b/g, 'they')
+        .replace(/\.([\s\n])/g, '.$1 ')
         .trim();
     },
   ]);
