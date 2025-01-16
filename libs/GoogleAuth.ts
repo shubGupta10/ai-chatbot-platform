@@ -11,7 +11,7 @@ export const authenticateGoogle = async () => {
   // Initialize GoogleAuth with the credentials object
   const auth = new GoogleAuth({
     credentials,  // Pass the parsed credentials object
-    scopes: ['https://www.googleapis.com/auth/cloud-platform'],  // Scope for Google Cloud APIs
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],  
   });
 
   // Get the authenticated client
