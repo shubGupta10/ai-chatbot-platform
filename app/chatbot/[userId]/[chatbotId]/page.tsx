@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
 import AIMessageContent from "@/components/ai-message-content";
 import UserMessageContent from "@/components/user-message-content";
@@ -39,7 +40,7 @@ const Chatbot = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
   
   const toggleDarkMode = () => {
@@ -50,6 +51,10 @@ const Chatbot = () => {
       document.documentElement.classList.add('dark');
     }
   };
+
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -200,128 +205,124 @@ const Chatbot = () => {
 
   return (
     <>
-    <div className={`min-h-screen flex flex-col bg-background transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
-      <Card className="flex-grow flex flex-col m-4 sm:m-8 md:max-w-4xl md:mx-auto shadow-2xl border-primary/10">
-        <CardHeader className="border-2 rounded-md  bg-card/95 backdrop-blur-sm px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Sparkles className="h-7 w-7 text-primary animate-pulse" />
-              <div className="absolute inset-0 blur-sm bg-primary/20 rounded-full animate-pulse" />
+      <div className={`min-h-screen flex flex-col bg-background transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+        <Card className="flex-grow flex flex-col m-2 sm:m-4 md:m-8 lg:max-w-6xl lg:mx-auto shadow-2xl border-primary/10">
+          <CardHeader className="border-b bg-card/95 backdrop-blur-sm px-4 py-3 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                <div className="absolute inset-0 blur-sm bg-primary/20 rounded-full animate-pulse" />
+              </div>
+              <CardTitle className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/60">
+                AI Assistant
+              </CardTitle>
             </div>
-            <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/60">
-              AI Assistant
-            </CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={clearChat}
-                    className="bg-secondary hover:bg-secondary/90 transition-all duration-200"
+            <div className="flex items-center gap-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={clearChat}
+                      variant="ghost"
+                      size="icon"
+                      className="hover:bg-secondary/20"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Clear Chat</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <div className="flex items-center space-x-2">
+                <Sun className="h-4 w-4" />
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={toggleDarkMode}
+                  className="data-[state=checked]:bg-primary"
+                />
+                <Moon className="h-4 w-4" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-grow overflow-hidden p-0 relative">
+            <ScrollArea className="h-[calc(100vh-12rem)] sm:h-[calc(100vh-14rem)]">
+              <div className="p-4 space-y-4">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${msg.sender === "ai" ? "justify-start" : "justify-end"} animate-in fade-in-50 slide-in-from-bottom-2 duration-300`}
                   >
-                    <Trash2 className="h-5 w-5 text-black dark:text-white" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Clear Chat</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={toggleDarkMode}
-                    className="bg-primary hover:bg-primary/90 transition-all duration-200"
-                  >
-                    {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-grow overflow-hidden p-0 relative">
-          <ScrollArea className="h-full">
-            <div className="p-6 space-y-6">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.sender === "ai" ? "justify-start" : "justify-end"} animate-in fade-in-50 slide-in-from-bottom-2 duration-300`}
-                >
-                  <div className={`flex items-start space-x-3 max-w-[85%] ${msg.sender === "ai" ? "flex-row" : "flex-row-reverse"}`}>
-                    <Avatar className={`w-8 h-8 ring-2 transition-all duration-300 ${
-                      msg.sender === "ai" 
-                        ? "ring-primary/20 bg-primary/10 hover:ring-primary/40" 
-                        : "ring-secondary/20 bg-secondary/10 hover:ring-secondary/40"
-                    }`}>
-                      <AvatarFallback className={`${msg.sender === "ai" ? "text-primary" : "text-secondary-foreground"}`}>
-                        {msg.sender === "ai" ? <Bot size={16} /> : <User size={16} />}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      {msg.sender === "ai" ? (
-                        <AIMessageContent content={msg.text} isTyping={isTyping && index === messages.length - 1} />
-                      ) : (
-                        <UserMessageContent content={msg.text} />
-                      )}
-                      <div className="text-xs text-muted-foreground/60 px-2">
-                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div className={`flex items-start space-x-2 max-w-[85%] ${msg.sender === "ai" ? "flex-row" : "flex-row-reverse"}`}>
+                      <Avatar className={`w-8 h-8 ring-2 transition-all duration-300 ${
+                        msg.sender === "ai" 
+                          ? "ring-primary/20 bg-primary/10 hover:ring-primary/40" 
+                          : "ring-secondary/20 bg-secondary/10 hover:ring-secondary/40"
+                      }`}>
+                        <AvatarFallback className={`${msg.sender === "ai" ? "text-primary" : "text-secondary-foreground"}`}>
+                          {msg.sender === "ai" ? <Bot size={16} /> : <User size={16} />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        {msg.sender === "ai" ? (
+                          <AIMessageContent content={msg.text} isTyping={isTyping && index === messages.length - 1} />
+                        ) : (
+                          <UserMessageContent content={msg.text} />
+                        )}
+                        <div className="text-xs text-muted-foreground/60 px-2">
+                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              <div ref={scrollRef} />
-            </div>
-            {isLoading && !isTyping && (
-              <div className="flex justify-center items-center py-6">
-                <div className="relative">
-                  <Loader2 className="animate-spin text-primary h-8 w-8" />
-                  <div className="absolute inset-0 blur-md animate-pulse bg-primary/20 rounded-full" />
-                </div>
+                ))}
+                <div ref={scrollRef} />
               </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-        <CardFooter className="border-t p-4 bg-card/95 backdrop-blur-sm">
-          <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex w-full space-x-2">
-            <Input
-              ref={inputRef}
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              disabled={isLoading || isTyping}
-              className="flex-grow bg-background/50 border-primary/20 focus:border-primary/40 transition-all duration-200 hover:bg-background/80"
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading || isTyping || !message.trim()}
-                    className="bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20"
-                  >
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Send message</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Send Message</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </form>
-        </CardFooter>
-      </Card>
-    </div>
-    <ChatbotFooter/>
+              {isLoading && !isTyping && (
+                <div className="flex justify-center items-center py-4">
+                  <div className="relative">
+                    <Loader2 className="animate-spin text-primary h-6 w-6" />
+                    <div className="absolute inset-0 blur-md animate-pulse bg-primary/20 rounded-full" />
+                  </div>
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+          <CardFooter className="border-t p-3 bg-card/95 backdrop-blur-sm">
+            <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex w-full space-x-2">
+              <Input
+                ref={inputRef}
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                disabled={isLoading || isTyping}
+                className="flex-grow bg-background/50 border-primary/20 focus:border-primary/40 transition-all duration-200 hover:bg-background/80"
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      type="submit" 
+                      disabled={isLoading || isTyping || !message.trim()}
+                      className="bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-primary/20"
+                    >
+                      <Send className="h-4 w-4" />
+                      <span className="sr-only">Send message</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Send Message</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </form>
+          </CardFooter>
+        </Card>
+      </div>
+      <ChatbotFooter />
     </>
   );
 };

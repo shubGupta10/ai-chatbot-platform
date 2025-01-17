@@ -1,4 +1,6 @@
+import { NextResponse } from 'next/server';
 import redisClient from './redisClient';
+import redis from './UpstashClient';
 
 export const getCachedChatbots = async (userId: string) => {
   try {
@@ -7,7 +9,7 @@ export const getCachedChatbots = async (userId: string) => {
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-    return null; 
+    return null;
   } catch (error) {
     console.error('Error fetching from Redis:', error);
     return null;
@@ -33,7 +35,7 @@ export const SetSingleChatbot = async (userId: string, chatbotId: string, data: 
 export const getSingleChatbot = async (userId: string, chatbotId: string) => {
   try {
     const singleChatbot = await redisClient.get(`user:${userId}:chatbot:${chatbotId}`);
-    if(singleChatbot){
+    if (singleChatbot) {
       return JSON.parse(singleChatbot);
     }
     return null;
@@ -85,3 +87,34 @@ export const setCachedSessionDetails = async (sessionId: string, sessionDetails:
   }
 };
 
+
+export const setContextData = async (key: string, data: any, expiration?: number) => {
+  try {
+    if (expiration) {
+      await redis.set(key, JSON.stringify(data), { ex: expiration })
+    } else {
+      await redis.set(key, JSON.stringify(data));
+    }
+    return NextResponse.json({
+      message: "ContextData stored in redis"
+    }, { status: 200 })
+  } catch (error) {
+    console.error("Error storing data in Redis:", error);
+    throw error;
+  }
+}
+
+export const getContextData = async (key: string): Promise<any> => {
+  try {
+    const response = await redis.get(key);
+    if (typeof response === 'string') {
+      return JSON.parse(response);
+    } else {
+      console.log(`No data found for key: ${key}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching context data from Redis:", error);
+    return null;
+  }
+}

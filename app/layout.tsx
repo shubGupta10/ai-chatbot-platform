@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionWrapper } from "@/components/SessionWrapper";
 import  { Toaster } from 'react-hot-toast';
+import { Analytics } from "@vercel/analytics/react"
 
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default async function RootLayout({
     <SessionWrapper>
     <html lang="en">
       <body>
+        <Analytics/>
         {children}
         <Toaster />
       </body>
