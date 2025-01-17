@@ -34,6 +34,7 @@ const Chatbot = () => {
   const userId = params?.userId as string;
   const chatbotId = params?.chatbotId as string;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,14 +43,11 @@ const Chatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
   
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => !prev);
-    if (document.documentElement.classList.contains('dark')) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
+    document.documentElement.classList.toggle('dark');
   };
 
   useEffect(() => {
@@ -57,15 +55,32 @@ const Chatbot = () => {
   }, []);
 
   const scrollToBottom = () => {
-    if (scrollRef.current) {
+    if (scrollRef.current && autoScroll) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  // Handle scroll events to detect when user manually scrolls
   useEffect(() => {
-    scrollToBottom();
+    const scrollArea = scrollAreaRef.current;
+    if (!scrollArea) return;
+
+    const handleScroll = () => {
+      const { scrollHeight, scrollTop, clientHeight } = scrollArea;
+      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 50;
+      setAutoScroll(isAtBottom);
+    };
+
+    scrollArea.addEventListener('scroll', handleScroll);
+    return () => scrollArea.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (autoScroll) {
+      scrollToBottom();
+    }
     inputRef.current?.focus();
-  }, [messages]);
+  }, [messages, autoScroll]);
 
   useEffect(() => {
     if (userId && chatbotId) {
@@ -113,6 +128,7 @@ const Chatbot = () => {
     setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
     setMessage("");
+    setAutoScroll(true);
   
     try {
       await addSession({
@@ -206,8 +222,8 @@ const Chatbot = () => {
   return (
     <>
       <div className={`min-h-screen flex flex-col bg-background transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
-        <Card className="flex-grow flex flex-col m-2 sm:m-4 md:m-8 lg:max-w-6xl lg:mx-auto shadow-2xl border-primary/10">
-          <CardHeader className="border-b bg-card/95 backdrop-blur-sm px-4 py-3 flex justify-between items-center">
+        <Card className="flex-grow flex flex-col mx-auto w-full max-w-[95%] md:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] my-4 shadow-2xl border-primary/10">
+          <CardHeader className="border-b bg-card/95 backdrop-blur-sm px-4 py-3 flex justify-between items-center sticky top-0 z-50">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Sparkles className="h-6 w-6 text-primary animate-pulse" />
@@ -247,14 +263,17 @@ const Chatbot = () => {
             </div>
           </CardHeader>
           <CardContent className="flex-grow overflow-hidden p-0 relative">
-            <ScrollArea className="h-[calc(100vh-12rem)] sm:h-[calc(100vh-14rem)]">
+            <ScrollArea 
+              ref={scrollAreaRef as any}
+              className="h-[calc(100vh-14rem)] sm:h-[calc(100vh-12rem)]"
+            >
               <div className="p-4 space-y-4">
                 {messages.map((msg, index) => (
                   <div
                     key={index}
                     className={`flex ${msg.sender === "ai" ? "justify-start" : "justify-end"} animate-in fade-in-50 slide-in-from-bottom-2 duration-300`}
                   >
-                    <div className={`flex items-start space-x-2 max-w-[85%] ${msg.sender === "ai" ? "flex-row" : "flex-row-reverse"}`}>
+                    <div className={`flex items-start space-x-2 max-w-[90%] lg:max-w-[80%] ${msg.sender === "ai" ? "flex-row" : "flex-row-reverse"}`}>
                       <Avatar className={`w-8 h-8 ring-2 transition-all duration-300 ${
                         msg.sender === "ai" 
                           ? "ring-primary/20 bg-primary/10 hover:ring-primary/40" 
@@ -264,7 +283,7 @@ const Chatbot = () => {
                           {msg.sender === "ai" ? <Bot size={16} /> : <User size={16} />}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="space-y-1">
+                      <div className="space-y-1 flex-1">
                         {msg.sender === "ai" ? (
                           <AIMessageContent content={msg.text} isTyping={isTyping && index === messages.length - 1} />
                         ) : (
@@ -289,7 +308,7 @@ const Chatbot = () => {
               )}
             </ScrollArea>
           </CardContent>
-          <CardFooter className="border-t p-3 bg-card/95 backdrop-blur-sm">
+          <CardFooter className="border-t p-3 bg-card/95 backdrop-blur-sm sticky bottom-0 z-50">
             <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex w-full space-x-2">
               <Input
                 ref={inputRef}
@@ -328,4 +347,3 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
-
