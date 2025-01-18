@@ -37,28 +37,28 @@ export default function HomePage() {
         <Navbar />
 
         {/* Hero Section */}
-        <div className="container mx-auto px-6 pt-32 pb-24">
+        <div className="container mx-auto px-4 sm:px-6 pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-20 md:pb-24">
           <motion.div
-            className="text-center space-y-8 relative"
+            className="text-center space-y-6 sm:space-y-8 relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             {/* Background decorative elements */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-3xl -z-10"></div>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-3xl -z-10"></div>
 
             <motion.div
-              className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/50 border border-gray-700/40"
+              className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-800/50 border border-gray-700/40"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Sparkles className="w-5 h-5 text-purple-400 mr-2" />
-              <span className="text-gray-200">AI-Powered Chatbots</span>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 mr-2" />
+              <span className="text-sm sm:text-base text-gray-200">AI-Powered Chatbots</span>
             </motion.div>
 
             <motion.h1
-              className="text-5xl md:text-7xl font-bold"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight"
               variants={fadeInUp}
             >
               <span className="text-gray-100">
@@ -71,7 +71,7 @@ export default function HomePage() {
             </motion.h1>
 
             <motion.p
-              className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
+              className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-6"
               variants={fadeInUp}
             >
               Create, customize, and deploy AI chatbots that understand your business.
@@ -79,18 +79,18 @@ export default function HomePage() {
             </motion.p>
 
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4 sm:px-0"
               variants={fadeInUp}
             >
               <button
                 onClick={() => router.push('auth/signin')}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all duration-200 flex items-center justify-center"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all duration-200 flex items-center justify-center"
               >
-                Start Building Free <ArrowRight className="ml-2 h-5 w-5" />
+                Start Building Free <ArrowRight className="ml-2 h-4 sm:h-5 w-4 sm:w-5" />
               </button>
               <button
                 onClick={() => router.push('/how-to-use')}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl border border-gray-600 hover:border-purple-500/50 text-gray-300 font-semibold transition-all duration-200"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl border border-gray-600 hover:border-purple-500/50 text-gray-300 font-semibold transition-all duration-200"
               >
                 View Demo
               </button>
