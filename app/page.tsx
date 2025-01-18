@@ -83,7 +83,7 @@ export default function HomePage() {
               variants={fadeInUp}
             >
               <button
-                onClick={() => router.push('auth/signin')}
+                onClick={() => router.push('/dashboard')}
                 className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all duration-200 flex items-center justify-center"
               >
                 Start Building Free <ArrowRight className="ml-2 h-4 sm:h-5 w-4 sm:w-5" />
@@ -232,7 +232,7 @@ export default function HomePage() {
               </p>
               <button
                 className="px-8 py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all duration-200 flex items-center justify-center mx-auto"
-                onClick={() => router.push('auth/signin')}
+                onClick={() => router.push('/dashboard')}
               >
                 Start Building Now <ArrowRight className="ml-2 h-5 w-5" />
               </button>

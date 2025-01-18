@@ -12,11 +12,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
-import { AIMessageContent } from "@/components/ai-message-content";
 import { UserMessageContent } from "@/components/user-message-content";
 import { addSession } from "@/app/actions/session";
 import { calculateDurationInSeconds } from "@/app/actions/time";
 import ChatbotFooter from "@/components/ChatbotFooter";
+import EnhancedAIResponse from '@/components/EnhancedAIResponse';
 
 interface Message {
   text: string;
@@ -168,7 +168,11 @@ const Chatbot = () => {
     } catch (error) {
       console.error("Error sending message:", error);
       if (axios.isAxiosError(error) && error.response?.status === 429) {
-        toast.error('Rate limit exceeded. Please wait a moment before trying again.')
+        setMessages(prev => [...prev, { 
+          text: "Rate limit exceeded. Please wait a moment before trying again.",
+          sender: "ai",
+          timestamp: new Date() 
+        }]);
       } else {
         toast.error('Failed to send message. Please try again.');
       }
@@ -268,7 +272,10 @@ const Chatbot = () => {
                       </Avatar>
                       <div className="space-y-1 flex-1">
                         {msg.sender === "ai" ? (
-                          <AIMessageContent content={msg.text} isTyping={isTyping && index === messages.length - 1} />
+                          <EnhancedAIResponse 
+                            content={msg.text} 
+                            isRateLimited={false}
+                          />
                         ) : (
                           <UserMessageContent content={msg.text} />
                         )}
@@ -280,15 +287,16 @@ const Chatbot = () => {
                   </div>
                 ))}
                 <div ref={scrollRef} />
-              </div>
-              {isLoading && !isTyping && (
-                <div className="flex justify-center items-center py-4">
-                  <div className="relative">
-                    <Loader2 className="animate-spin text-primary h-6 w-6" />
-                    <div className="absolute inset-0 blur-md animate-pulse bg-primary/20 rounded-full" />
+                {isLoading && !isTyping && (
+                  <div className="flex justify-center items-center py-4">
+                    <div className="relative">
+                      <Loader2 className="animate-spin text-primary h-6 w-6" />
+                      <div className="absolute inset-0 blur-md animate-pulse bg-primary/20 rounded-full" />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+              
             </ScrollArea>
             {showScrollButton && (
               <Button
@@ -340,3 +348,4 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
+

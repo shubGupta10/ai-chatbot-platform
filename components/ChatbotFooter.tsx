@@ -21,7 +21,7 @@ export default function ChatbotFooter() {
                 asChild
                 className="bg-white text-purple-700 hover:bg-gray-100 hover:scale-105 transition-all duration-200 shadow-lg shadow-purple-900/20"
               >
-                <Link href="/create-bot" className="inline-flex items-center">
+                <Link href="https://ai-devchat.vercel.app" className="inline-flex items-center">
                   <Sparkles className="mr-2 h-4 w-4" />
                   Create Your Chatbot
                   <ExternalLink className="ml-2 h-4 w-4" />
@@ -50,7 +50,7 @@ export default function ChatbotFooter() {
             {/* Quick Links */}
             <div className="text-center">
               <div className="flex items-center justify-center space-x-6">
-                <Link
+                {/* <Link
                   href="https://github.com/devchat"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -58,14 +58,7 @@ export default function ChatbotFooter() {
                 >
                   <span className="sr-only">GitHub</span>
                   <Github className="h-6 w-6" />
-                </Link>
-                <Link
-                  href="mailto:contact@devchat.ai"
-                  className="text-gray-400 hover:text-purple-400 transition-colors duration-200"
-                >
-                  <span className="sr-only">Email</span>
-                  <Mail className="h-6 w-6" />
-                </Link>
+                </Link> */}
               </div>
             </div>
 
