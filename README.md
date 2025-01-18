@@ -1,5 +1,4 @@
-# DevChat - Build Intelligent & Context aware
-Chatbots
+# DevChat - Build Intelligent & Context aware Chatbots
 
 DevChat is a platform that enables users to create and deploy customized AI-powered chatbots. These chatbots can be integrated into websites, apps, and portfolios to enhance user interaction and provide valuable insights.
 
