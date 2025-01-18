@@ -47,7 +47,8 @@ DevChat is a platform that enables users to create and deploy customized AI-powe
    Create a `.env` file in the root directory and add the following:
    ```env
    DATABASE_URL=your_mongodb_connection_string
-   REDIS_URL=your_redis_connection_string
+   UPSTASH_REDIS_REST_URL=your_redis_connection_string
+   UPSTASH_REDIS_REST_TOKEN=your_redis_token_string
    VERTEX_API_KEY=your_vertex_ai_api_key
    NEXT_PUBLIC_API_URL=your_rest_api_endpoint
    NEXTAUTH_SECRET=your_nextauth_secret
@@ -94,12 +95,9 @@ Contributions are welcome! To contribute:
    ```
 5. Open a pull request.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
 If you have any questions, suggestions, or feedback, feel free to reach out:
 
-- Portfolio: [Your Portfolio](https://shubgupta.vercel.app)
+- Portfolio: [Contact me here](https://shubgupta.vercel.app)
