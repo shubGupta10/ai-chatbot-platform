@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Loader2, Send, User, Bot, Sparkles, Moon, Sun, Trash2 } from 'lucide-react';
+import { Loader2, Send, User, Bot, Sparkles, Moon, Sun, Trash2, ArrowDown } from 'lucide-react';
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
-import AIMessageContent from "@/components/ai-message-content";
-import UserMessageContent from "@/components/user-message-content";
+import { AIMessageContent } from "@/components/ai-message-content";
+import { UserMessageContent } from "@/components/user-message-content";
 import { addSession } from "@/app/actions/session";
 import { calculateDurationInSeconds } from "@/app/actions/time";
 import ChatbotFooter from "@/components/ChatbotFooter";
@@ -44,6 +44,7 @@ const Chatbot = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => !prev);
@@ -54,33 +55,14 @@ const Chatbot = () => {
     document.documentElement.classList.add('dark');
   }, []);
 
-  const scrollToBottom = () => {
-    if (scrollRef.current && autoScroll) {
+  const scrollToBottom = (force = false) => {
+    if (scrollRef.current && (autoScroll || force)) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      if (force) setAutoScroll(true);
     }
   };
 
-  // Handle scroll events to detect when user manually scrolls
-  useEffect(() => {
-    const scrollArea = scrollAreaRef.current;
-    if (!scrollArea) return;
 
-    const handleScroll = () => {
-      const { scrollHeight, scrollTop, clientHeight } = scrollArea;
-      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 50;
-      setAutoScroll(isAtBottom);
-    };
-
-    scrollArea.addEventListener('scroll', handleScroll);
-    return () => scrollArea.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (autoScroll) {
-      scrollToBottom();
-    }
-    inputRef.current?.focus();
-  }, [messages, autoScroll]);
 
   useEffect(() => {
     if (userId && chatbotId) {
@@ -129,6 +111,7 @@ const Chatbot = () => {
     setIsLoading(true);
     setMessage("");
     setAutoScroll(true);
+    scrollToBottom(true);
   
     try {
       await addSession({
@@ -223,7 +206,7 @@ const Chatbot = () => {
     <>
       <div className={`min-h-screen flex flex-col bg-background transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
         <Card className="flex-grow flex flex-col mx-auto w-full max-w-[95%] md:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] my-4 shadow-2xl border-primary/10">
-          <CardHeader className="border-b bg-card/95 backdrop-blur-sm px-4 py-3 flex justify-between items-center sticky top-0 z-50">
+          <CardHeader className="border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/50 px-4 py-3 flex justify-between items-center sticky top-0 z-50">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Sparkles className="h-6 w-6 text-primary animate-pulse" />
@@ -241,7 +224,7 @@ const Chatbot = () => {
                       onClick={clearChat}
                       variant="ghost"
                       size="icon"
-                      className="hover:bg-secondary/20"
+                      className="hover:bg-secondary/20 transition-colors duration-200"
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>
@@ -307,8 +290,18 @@ const Chatbot = () => {
                 </div>
               )}
             </ScrollArea>
+            {showScrollButton && (
+              <Button
+                variant="secondary"
+                size="icon"
+                className="absolute bottom-4 right-4 rounded-full shadow-lg animate-bounce"
+                onClick={() => scrollToBottom(true)}
+              >
+                <ArrowDown className="h-4 w-4" />
+              </Button>
+            )}
           </CardContent>
-          <CardFooter className="border-t p-3 bg-card/95 backdrop-blur-sm sticky bottom-0 z-50">
+          <CardFooter className="border-t p-3 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/50 sticky bottom-0 z-50">
             <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex w-full space-x-2">
               <Input
                 ref={inputRef}

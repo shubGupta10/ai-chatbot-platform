@@ -10,7 +10,7 @@ interface AIMessageContentProps {
   isTyping: boolean;
 }
 
-const AIMessageContent: React.FC<AIMessageContentProps> = ({ content, isTyping }) => {
+export const AIMessageContent: React.FC<AIMessageContentProps> = ({ content, isTyping }) => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(content).then(() => {
       toast.success('Message copied to clipboard');
@@ -80,20 +80,24 @@ const AIMessageContent: React.FC<AIMessageContentProps> = ({ content, isTyping }
   };
 
   return (
-    <Card className="w-full p-4 bg-secondary/50 dark:bg-secondary/10 backdrop-blur-sm border-secondary/30 shadow-lg relative group transition-all duration-200 hover:shadow-xl hover:shadow-secondary/10">
+    <Card className="w-full p-4 bg-secondary/50 dark:bg-secondary/10 backdrop-blur-sm border-secondary/30 shadow-lg relative group transition-all duration-300 hover:shadow-xl hover:shadow-secondary/10 hover:-translate-y-0.5">
       <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-secondary/10 to-secondary/20 dark:from-secondary/10 dark:via-secondary/20 dark:to-secondary/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="absolute inset-0 bg-secondary dark:bg-secondary/20 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
       <ScrollArea className="relative max-h-[60vh] pr-4">
         <div className="space-y-2 relative z-10">
           {renderContent(content)}
           {isTyping && (
-            <span className="inline-block animate-pulse text-primary">▋</span>
+            <span className="inline-flex animate-pulse">
+              <span className="h-4 w-2 bg-primary rounded-full mr-1 animate-bounce [animation-delay:-0.3s]" />
+              <span className="h-4 w-2 bg-primary rounded-full mr-1 animate-bounce [animation-delay:-0.15s]" />
+              <span className="h-4 w-2 bg-primary rounded-full animate-bounce" />
+            </span>
           )}
         </div>
       </ScrollArea>
       <button
         onClick={copyToClipboard}
-        className="absolute top-2 right-2 p-1.5 rounded-full bg-secondary/50 hover:bg-secondary/70 text-secondary-foreground/70 hover:text-secondary-foreground transition-all duration-200 opacity-0 group-hover:opacity-100"
+        className="absolute top-2 right-2 p-1.5 rounded-full bg-secondary/50 hover:bg-secondary/70 text-secondary-foreground/70 hover:text-secondary-foreground transition-all duration-200 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0"
         aria-label="Copy message"
       >
         <Copy size={16} />
@@ -101,5 +105,3 @@ const AIMessageContent: React.FC<AIMessageContentProps> = ({ content, isTyping }
     </Card>
   );
 };
-
-export default AIMessageContent;
