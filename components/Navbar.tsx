@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Home, LayoutDashboard, LogOut, Menu, X, LinkIcon, BookIcon, Sparkles, User } from 'lucide-react';
+import { Home, LayoutDashboard, LogOut, Menu, X, LinkIcon, BookIcon, Sparkles, User, Contact2Icon } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +22,12 @@ const Navbar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
   const router = useRouter();
+  const [CheckAdmin, setCheckAdmin] = useState(false);
+  const user = session?.user;
+
+  useEffect(() => {
+    setCheckAdmin(user?.isAdmin ?? false);
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,12 +54,20 @@ const Navbar = () => {
     setIsMenuOpen(false);
   }, [pathname]);
 
-  const navItems = [
-    { label: 'Home', href: '/', icon: Home },
-    { label: 'How to use', href: '/how-to-use', icon: BookIcon },
-    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { label: 'Generate Link', href: '/generateLink', icon: LinkIcon },
-  ];
+  const navItems = CheckAdmin
+    ? [
+        { label: 'Display Users', href: '/admin/DisplayUsers', icon: Contact2Icon },
+        { label: 'Home', href: '/', icon: Home },
+        { label: 'How to use', href: '/how-to-use', icon: BookIcon },
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Generate Link', href: '/generateLink', icon: LinkIcon },
+      ]
+    : [
+        { label: 'Home', href: '/', icon: Home },
+        { label: 'How to use', href: '/how-to-use', icon: BookIcon },
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Generate Link', href: '/generateLink', icon: LinkIcon },
+      ];
 
   const handleSignOut = async () => {
     const data = await signOut({ redirect: false, callbackUrl: '/' });
@@ -186,46 +200,14 @@ const Navbar = () => {
               ) : (
                 <Link
                   href="/auth/signin"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl bg-purple-500 hover:bg-purple-600 text-white ring-1 ring-purple-500/50 hover:ring-purple-600/50 transition-all duration-300"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl bg-purple-500 hover:bg-purple-600 text-white ring-1 ring-transparent hover:ring-purple-400/20 transition-all duration-300"
                 >
-                  Get Started
+                  Sign In
                 </Link>
               )}
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation Menu */}
-        {session && (
-          <div
-            className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-              isMenuOpen 
-                ? 'max-h-[400px] opacity-100 border-t border-purple-900/20' 
-                : 'max-h-0 opacity-0'
-            }`}
-          >
-            <div className="bg-gray-900/95 backdrop-blur-md px-4 pt-2 pb-3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`group flex items-center px-4 py-3 text-sm rounded-xl transition-all duration-300 mb-2 ${
-                    pathname === item.href
-                      ? 'text-purple-300 bg-purple-400/10 ring-1 ring-purple-400/20'
-                      : 'text-gray-300 hover:text-purple-300 hover:bg-purple-400/10 hover:ring-1 hover:ring-purple-400/20'
-                  }`}
-                >
-                  <item.icon className={`mr-2.5 h-4 w-4 transition-colors duration-300 ${
-                    pathname === item.href 
-                      ? 'text-purple-400' 
-                      : 'text-gray-400 group-hover:text-purple-400'
-                  }`} />
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );

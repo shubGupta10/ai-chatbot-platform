@@ -8,6 +8,7 @@ export interface User extends Document {
     image: string;
     link: string;
     createdAt: Date;
+    isAdmin: boolean;
 }
 
 const UserSchema: Schema<User> = new mongoose.Schema({
@@ -32,6 +33,10 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     },
     link: {
         type: String,
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
     },
     createdAt: {
         type: Date,

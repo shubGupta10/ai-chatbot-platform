@@ -8,6 +8,7 @@ declare module "next-auth" {
         user: {
             id?: string;
             username?: string;
+            isAdmin?: boolean;
         } & DefaultSession["user"];
     }
 }
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
                         name: user.name,
                         email: user.email,
                         image: user.image,
+                        isAdmin: false,
                     });
                 }
                 return true;
@@ -46,12 +48,13 @@ export const authOptions: NextAuthOptions = {
         async session({session, token}){
             try {
                 await dbConnect();
-                const dbUser = await UserModel.findOne({email: session.user?.email}) as { _id: string, username: string, name: string, image: string };
+                const dbUser = await UserModel.findOne({email: session.user?.email}) as { _id: string, username: string, name: string, image: string, isAdmin: boolean };
                 if (session.user && dbUser) {
                     session.user.id = dbUser._id.toString();
                     session.user.username = dbUser.username;
                     session.user.name = dbUser.name;
                     session.user.image = dbUser.image;
+                    session.user.isAdmin = dbUser.isAdmin;
                 }
                 return session;
             } catch (error) {
