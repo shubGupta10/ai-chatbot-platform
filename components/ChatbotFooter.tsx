@@ -18,15 +18,21 @@ export default function ChatbotFooter() {
                 Transform your ideas into intelligent conversations with DevChat's powerful platform.
               </p>
               <Button
-                asChild
-                className="bg-white text-purple-700 hover:bg-gray-100 hover:scale-105 transition-all duration-200 shadow-lg shadow-purple-900/20"
-              >
-                <Link href="https://ai-devchat.vercel.app" className="inline-flex items-center">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Create Your Chatbot
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+  asChild
+  className="bg-white text-purple-700 hover:bg-gray-100 hover:scale-105 transition-all duration-200 shadow-lg shadow-purple-900/20"
+>
+  <Link 
+    href="https://ai-devchat.vercel.app" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="inline-flex items-center"
+  >
+    <Sparkles className="mr-2 h-4 w-4" />
+    Create Your Chatbot
+    <ExternalLink className="ml-2 h-4 w-4" />
+  </Link>
+</Button>
+
             </div>
           </div>
         </div>
