@@ -7,8 +7,10 @@ import { getContextData, setContextData } from "@/app/redis/redisFunction";
 
 const limiter = rateLimit({
   interval: 60 * 1000,
-  uniqueTokenPerInterval: 500, 
+  uniqueTokenPerInterval: 500,
 });
+
+const chatbotChains = new Map(); 
 
 export async function POST(
   req: NextRequest,
@@ -19,10 +21,7 @@ export async function POST(
     const ip = forwardedFor ? forwardedFor.split(",")[0] : "127.0.0.1";
     await limiter.check(NextResponse.next(), 10, ip);
 
-    await dbConnect();
-
     const { userId, chatbotId } = await params;
-
     if (!userId || !chatbotId) {
       return NextResponse.json({ error: "Invalid URL parameters" }, { status: 400 });
     }
@@ -35,18 +34,17 @@ export async function POST(
       );
     }
 
-    const chatbotFromDb = await chatbotModel.findOne({
-      _id: chatbotId,
-      userId,
-    });
-    
     let contextDataFromRedis = await getContextData(`Context data: ${userId}`);
-
-    if (!contextDataFromRedis && chatbotFromDb) {
-      // If context data is not found in Redis, fetch from DB
-      contextDataFromRedis = chatbotFromDb.contextData;
-      // Store the context data in Redis for future use
-      await setContextData(`Context data: ${userId}`, contextDataFromRedis, 0);
+    if (!contextDataFromRedis) {
+      await dbConnect();
+      const chatbotFromDb = await chatbotModel.findOne({
+        _id: chatbotId,
+        userId,
+      });
+      if (chatbotFromDb) {
+        contextDataFromRedis = chatbotFromDb.contextData;
+        await setContextData(`Context data: ${userId}`, contextDataFromRedis, 0);
+      }
     }
 
     if (!contextDataFromRedis) {
@@ -71,9 +69,15 @@ export async function POST(
       return NextResponse.json({ error: "No context data found for this chatbot" }, { status: 400 });
     }
 
-    console.log("Processed Instruction:", instruction);
 
-    const chat = await createConversationChain(instruction, history);
+    let chat;
+    if (chatbotChains.has(chatbotId)) {
+      chat = chatbotChains.get(chatbotId);
+    } else {
+      chat = await createConversationChain(instruction, history);
+      chatbotChains.set(chatbotId, chat);
+    }
+
     const response = await chat(message);
 
     const conversationStarters = [
